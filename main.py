@@ -17,6 +17,12 @@ if getattr(sys, 'frozen', False):
 else:
     base_dir = Path(__file__).resolve().parent
 
+# ─── Icon path (works both in script mode and inside PyInstaller bundle) ───
+if getattr(sys, 'frozen', False):
+    ICON_PATH = Path(sys._MEIPASS) / "calendar.ico"
+else:
+    ICON_PATH = Path(__file__).resolve().parent / "calendar.ico"
+
 # ─── Secure Import of ttkbootstrap ───
 ttkbootstrap_ok = False
 try:
@@ -157,6 +163,18 @@ class CalendarApp:
         self.root.geometry(f"{window_settings['w']}x{window_settings['h']}+{window_settings['x']}+{window_settings['y']}")
         self.root.configure(bg='#f9f9f9')
 
+        # --- Window icon ---
+        if getattr(sys, 'frozen', False):
+            _icon_dir = Path(sys._MEIPASS)
+        else:
+            _icon_dir = Path(__file__).resolve().parent
+        _icon_path = _icon_dir / "calendar.ico"
+        if _icon_path.exists():
+            try:
+                self.root.iconbitmap(str(_icon_path))
+            except Exception as ex:
+                log(f'iconbitmap failed: {ex}')
+
         self._setup_styles()
         self._build_ui()
         self.refresh()
@@ -180,14 +198,13 @@ class CalendarApp:
         main.pack(fill='both', expand=True, padx=20, pady=20)
 
         # Left panel (calendar and import)
-        left = ttk.Frame(main, width=600)
+        left = ttk.Frame(main, width=700)
         left.pack(side='left', fill='y', padx=(0, 10))
         left.pack_propagate(False)
 
         # Right panel (settings and events tabs)
         right = ttk.Frame(main, width=400)
-        right.pack(side='left', fill='y', padx=(10, 0))
-        right.pack_propagate(False)
+        right.pack(side='left', fill='both', expand=True, padx=(10, 0))
 
         # Initialize UI components
         self.import_bar = ImportBar(left, on_import=self._manual_import)
@@ -446,7 +463,7 @@ def notify_event(event_id):
                 message=f"Event Reminder: {event['title']}\nDate: {event['date']} Time: {event['start']}",
                 timeout=10,
                 app_name='Smart Calendar',
-                app_icon='calendar.ico'
+                app_icon=str(ICON_PATH) if ICON_PATH.exists() else None,
             )
     except Exception as ex:
         log(f'notify_event failed: {ex}')
