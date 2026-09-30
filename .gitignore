@@ -221,7 +221,3 @@ __marimo__/
 db.json
 *.back.json
 *.tmp.json
-
-# Import directory contents (except maybe structure)
-import/*.json
-!import/

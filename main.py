@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""Точка входа приложения Smart Calendar.
+
+Режимы интерфейса:
+- ttkbootstrap (если установлен) — современное оформление;
+- чистый tkinter/ttk — базовый режим без внешних зависимостей.
+
+Импорт JSON выполняется через import_handler. События в календарь
+передаются явно при каждом обновлении.
+"""
 
 import datetime
 import sys
@@ -9,473 +18,509 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 
-from apscheduler.schedulers.background import BackgroundScheduler
-
-# ─── Base Directory Configuration (For PyInstaller and Standard Execution) ───
-if getattr(sys, 'frozen', False):
-    base_dir = Path(sys.executable).resolve().parent
-else:
-    base_dir = Path(__file__).resolve().parent
-
-# ─── Icon path (works both in script mode and inside PyInstaller bundle) ───
-if getattr(sys, 'frozen', False):
-    ICON_PATH = Path(sys._MEIPASS) / "calendar.ico"
-else:
-    ICON_PATH = Path(__file__).resolve().parent / "calendar.ico"
-
-# ─── Secure Import of ttkbootstrap ───
+# Необязательная библиотека оформления.
 ttkbootstrap_ok = False
 try:
-    import ttkbootstrap as ttkb
-    from ttkbootstrap.constants import *
+    import ttkbootstrap as ttkb  # type: ignore
     ttkbootstrap_ok = True
 except Exception:
     pass
 
-# ─── Secure Import of plyer ───
-plyer_ok = False
-try:
-    from plyer import notification as plyer_notify
-    plyer_ok = True
-except Exception:
-    pass
+# Корневой каталог проекта: рядом с exe (frozen) или со скриптом.
+if getattr(sys, 'frozen', False):
+    BASE_DIR = Path(sys.executable).resolve().parent
+    _RES = Path(sys._MEIPASS)
+    ICON_ICO = _RES / "calendar.ico"
+    ICON_PNG = _RES / "calendar.png"
+    ICON_PNG_512 = _RES / "calendar_512.png"
+else:
+    BASE_DIR = Path(__file__).resolve().parent
+    ICON_ICO = BASE_DIR / "calendar.ico"
+    ICON_PNG = BASE_DIR / "calendar.png"
+    ICON_PNG_512 = BASE_DIR / "calendar_512.png"
 
-# ─── Project Module Imports ───
-sys.path.insert(0, str(base_dir))
-from data_manager import load_db, save_db, initialize_db, get_settings, update_settings
+sys.path.insert(0, str(BASE_DIR))
+
+from data_manager import load_db, save_db
 from calendar_view import CalendarView
 from event_feed import EventFeed
-from settings_controls import SettingsControls
 from import_bar import ImportBar
-from tabbed_ui import TabbedUI
+from import_handler import get_import_files, import_files
+from settings_controls import SettingsControls
 
-# ─── Constants Definition ───
+
 APP_NAME = "Smart Calendar"
+DEFAULT_CATEGORY = "event"
 
-# ─── Вспомогательные функции ───
-def log(msg):
-    """Logs application messages with timestamp."""
+
+def log(msg: str) -> None:
+    """Вывод сообщения в консоль с временной меткой."""
     print(f'[{datetime.datetime.now().strftime("%H:%M:%S")}] {msg}')
 
-def get_all_events(data, start, end):
-    """Retrieves all events within a specified date range."""
-    events = []
-    
-    # Standard events
-    for e in data['events']:
-        try:
-            event_date = datetime.date.fromisoformat(e['date'])
-            if start <= event_date <= end:
-                events.append(e)
-        except:
-            pass
-    
-    # Recurring events
-    for rec in data['recurring']:
-        try:
-            dates = gen_recurring_dates(rec, start, end)
-            for date in dates:
-                if date not in rec.get('skipped_dates', []):
-                    ev = {
-                        **rec,
-                        'date': date.isoformat(),
-                        'id': f'rec:{rec["id"]}:{date.isoformat()}',
-                        'status': 'pending' if date not in rec.get('done_dates', []) else 'done'
-                    }
-                    if start <= date <= end:
-                        events.append(ev)
-        except:
-            pass
-    
-    return events
+
+def _safe_int(value, default: int) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
 
 
 def gen_recurring_dates(rec, start, end):
-    """Generates dates for recurring events based on recurrence rules."""
+    """Возвращает даты повторяющегося события в диапазоне [start, end].
+
+    Требует поле start_date (YYYY-MM-DD). Если оно отсутствует,
+    возвращает пустой список и логирует предупреждение.
+    """
     dates = []
+    start_date = rec.get('start_date')
+    if not start_date:
+        log(f"recurring '{rec.get('id', '?')}' пропущено: нет start_date")
+        return dates
+
     try:
-        rule = rec.get('rule', {})
-        freq = rule.get('freq', 'daily')
-        interval = rule.get('interval', 1)
-        
+        base = datetime.date.fromisoformat(str(start_date))
+    except (ValueError, TypeError):
+        log(f"recurring '{rec.get('id', '?')}' пропущено: некорректный start_date")
+        return dates
+
+    rule = rec.get('rule') or {}
+    freq = rule.get('freq', 'daily')
+    interval = max(_safe_int(rule.get('interval', 1), 1), 1)
+
+    until = None
+    until_raw = rule.get('until')
+    if until_raw:
+        try:
+            until = datetime.date.fromisoformat(str(until_raw))
+        except (ValueError, TypeError):
+            until = None
+
+    limit = min(end, until) if until else end
+    if base > limit:
+        return dates
+
+    current = base
+    guard = 0
+    while current <= limit and guard < 5000:
+        guard += 1
+        if current >= start:
+            dates.append(current)
+
         if freq == 'daily':
-            current = start
-            while current <= end:
-                dates.append(current)
-                current += datetime.timedelta(days=interval)
+            current += datetime.timedelta(days=interval)
         elif freq == 'weekly':
-            current = start
-            while current <= end:
-                dates.append(current)
-                current += datetime.timedelta(weeks=interval)
+            current += datetime.timedelta(weeks=interval)
         elif freq == 'monthly':
-            current = start
-            while current <= end:
-                dates.append(current)
-                if current.month == 12:
-                    current = current.replace(year=current.year + 1, month=1)
-                else:
-                    current = current.replace(month=current.month + 1)
+            month = current.month + interval
+            year = current.year + (month - 1) // 12
+            month = (month - 1) % 12 + 1
+            try:
+                current = current.replace(year=year, month=month)
+            except ValueError:
+                break
         elif freq == 'yearly':
-            current = start
-            while current <= end:
-                dates.append(current)
-                current = current.replace(year=current.year + 1)
-    except Exception as e:
-        log(f'gen_recurring_dates error: {e}')
-    
+            try:
+                current = current.replace(year=current.year + interval)
+            except ValueError:
+                break
+        else:
+            break
     return dates
 
 
-def update_statuses(data):
-    """Updates event statuses based on current date."""
-    today = datetime.date.today()
-    
-    for e in data['events']:
+def get_all_events(data, start, end):
+    """Возвращает обычные и развёрнутые повторяющиеся события за период."""
+    events = []
+
+    for e in data.get('events', []):
         try:
             event_date = datetime.date.fromisoformat(e['date'])
-            if e['status'] == 'pending' and event_date < today:
-                e['status'] = 'missed'
-        except:
-            pass
-    
-    return data
+        except (KeyError, ValueError, TypeError):
+            continue
+        if start <= event_date <= end:
+            events.append(e)
 
-# ─── Глобальные переменные ───
-scheduler = BackgroundScheduler()
-scheduler.start()
+    for rec in data.get('recurring', []):
+        done = set(rec.get('done_dates', []) or [])
+        skipped = set(rec.get('skipped_dates', []) or [])
+        for d in gen_recurring_dates(rec, start, end):
+            iso = d.isoformat()
+            if iso in skipped:
+                continue
+            ev = dict(rec)
+            ev['date'] = iso
+            ev['id'] = f"rec:{rec.get('id', '?')}:{iso}"
+            ev['status'] = 'done' if iso in done else 'pending'
+            ev.pop('rule', None)
+            ev.pop('done_dates', None)
+            ev.pop('skipped_dates', None)
+            events.append(ev)
+    return events
 
-# ─── Main Application Class ───
-class CalendarApp:
+
+class SmartCalendar:
+    """Главное окно приложения."""
+
     def __init__(self):
-        """Initializes the Smart Calendar application."""
-        initialize_db()
-        self.data = load_db()
-        self.editing_id = None
-        self.today = datetime.date.today()
-        
+        # Единый корневой виджет: либо ttkbootstrap.Window, либо tk.Tk.
         if ttkbootstrap_ok:
-            self.root = ttkb.Window(themename="flatly")
+            self.root = ttkb.Window(themename="litera")
         else:
             self.root = tk.Tk()
+
         self.root.title(APP_NAME)
-        window_settings = get_settings().get('window', {'x': 100, 'y': 100, 'w': 1200, 'h': 800})
-        self.root.geometry(f"{window_settings['w']}x{window_settings['h']}+{window_settings['x']}+{window_settings['y']}")
-        self.root.configure(bg='#f9f9f9')
+        self.root.geometry("1000x700")
+        self.root.minsize(800, 600)
+        self._set_icon()
 
-        # --- Window icon ---
-        if getattr(sys, 'frozen', False):
-            _icon_dir = Path(sys._MEIPASS)
-        else:
-            _icon_dir = Path(__file__).resolve().parent
-        _icon_path = _icon_dir / "calendar.ico"
-        if _icon_path.exists():
+        self.db = load_db()
+        self.current_date = datetime.date.today()
+
+        self.create_menu()
+        self.create_toolbar()
+        self.create_status_bar()
+        self.create_main_content()
+
+        self._auto_import()
+
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        log('Application initialized')
+
+    def _set_icon(self) -> None:
+        """Устанавливает иконку окна кросс-платформенно.
+
+        Приоритет источников:
+        1. calendar_512.png — максимальное качество для панели задач.
+        2. calendar.png     — резервный PNG.
+        3. calendar.ico     — запасной вариант для Windows.
+        """
+        for attr, path in (
+            ("_icon_img_512", ICON_PNG_512),
+            ("_icon_img", ICON_PNG),
+        ):
             try:
-                self.root.iconbitmap(str(_icon_path))
-            except Exception as ex:
-                log(f'iconbitmap failed: {ex}')
+                if path.exists():
+                    img = tk.PhotoImage(file=str(path))
+                    setattr(self, attr, img)
+                    self.root.iconphoto(True, img)
+                    return
+            except Exception:
+                continue
+        try:
+            if ICON_ICO.exists():
+                self.root.iconbitmap(str(ICON_ICO))
+        except Exception:
+            pass
 
-        self._setup_styles()
-        self._build_ui()
-        self.refresh()
-        self.root.after(120000, self._auto_refresh)
-        self.root.bind('<Configure>', self._on_configure)
-        self.root.protocol("WM_DELETE_WINDOW", self._on_close)
+    def _auto_import(self) -> None:
+        """Импорт подходящих JSON при запуске через import_handler."""
+        try:
+            files = get_import_files()
+            if not files:
+                return
+            imported, _, errors = import_files(files)
+            for err in errors[:5]:
+                log(f"import: {err}")
+            if imported:
+                self.db = load_db()
+                log(f"auto-import: {imported} новых событий")
+        except Exception as e:
+            log(f"auto-import failed: {e}")
 
-    def _setup_styles(self):
-        style = ttk.Style()
-        style.configure('TFrame', background='#f9f9f9')
-        style.configure('TLabel', background='#f9f9f9', foreground='#222222', font=('Segoe UI', 11))
-        style.configure('Header.TLabel', font=('Segoe UI', 16, 'bold'), foreground='#333')
-        style.configure('Subheader.TLabel', font=('Segoe UI', 10), foreground='#888')
-        style.configure('TButton', font=('Segoe UI', 9), background='#ffffff')
-        style.map('TButton', background=[('active', '#e8e8e8')])
+    def create_menu(self) -> None:
+        menubar = tk.Menu(self.root)
+        self.root.config(menu=menubar)
+        view_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="View", menu=view_menu)
+        view_menu.add_command(label="Refresh", command=self.refresh_all)
 
-    def _build_ui(self):
-        """Constructs the main user interface components."""
-        # Main container
-        main = ttk.Frame(self.root)
-        main.pack(fill='both', expand=True, padx=20, pady=20)
+    def create_toolbar(self) -> None:
+        toolbar = ttk.Frame(self.root)
+        toolbar.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+        ttk.Button(toolbar, text="Add Event", command=self.add_event).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar, text="Today", command=self.go_to_today).pack(side=tk.LEFT, padx=2)
 
-        # Left panel (calendar and import)
-        left = ttk.Frame(main, width=700)
-        left.pack(side='left', fill='y', padx=(0, 10))
-        left.pack_propagate(False)
+    def create_main_content(self) -> None:
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-        # Right panel (settings and events tabs)
-        right = ttk.Frame(main, width=400)
-        right.pack(side='left', fill='both', expand=True, padx=(10, 0))
+        self.calendar_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.calendar_frame, text='Calendar')
 
-        # Initialize UI components
-        self.import_bar = ImportBar(left, on_import=self._manual_import)
-        self.calendar = CalendarView(left, on_month_change=self._refresh_calendar, on_event_select=self._on_event_selected)
-        
-        # Create tabs for events and settings
-        self.tabbed_ui = TabbedUI(
-            right,
-            events=[],
-            on_select_event=self._on_event_selected,
-            on_event_action=self._handle_feed_item_click,
-            on_settings_change=self._update_settings,
-            on_data_change=self.refresh,
+        self.feed_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.feed_frame, text='Events')
+
+        self.settings_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.settings_frame, text='Settings')
+
+        self.calendar_view = CalendarView(
+            parent=self.calendar_frame,
+            on_date_select=self.show_date_events,
+            on_month_change=self.on_calendar_month_change,
+            on_event_select=self.show_event_detail_simple,
         )
 
-        # Configure column weights for optimal layout
-        main.columnconfigure(0, weight=1)
+        # Панель импорта над лентой событий.
+        self.import_bar = ImportBar(
+            parent=self.feed_frame,
+            on_import=self._on_import_done,
+        )
 
-    def _on_event_selected(self, event):
-        """Обработчик выбора события."""
-        if isinstance(event, dict) and 'title' in event:
-            self.tabbed_ui.show_event_details(event)
+        self.event_feed = EventFeed(
+            parent=self.feed_frame,
+            on_item_click=self.show_event_detail_from_feed,
+        )
 
-    def _refresh_calendar(self):
-        """Обновляет календарь."""
-        week_start = self.calendar.curr_week_start
-        week_end = week_start + datetime.timedelta(days=6)
-        events = get_all_events(self.data, week_start, week_end)
-        self.calendar.refresh(events)
+        # Вкладка Settings: параметры уведомлений и swap db.json/db.back.json.
+        self.settings_controls = SettingsControls(
+            parent=self.settings_frame,
+            on_settings_change=self._on_settings_change,
+            on_data_change=self._reload_after_backup,
+        )
 
-    def _update_settings(self, settings: dict) -> None:
-        """Updates application settings and applies changes."""
+        self.refresh_all()
+
+    def create_status_bar(self) -> None:
+        self.status_var = tk.StringVar()
+        self.status_var.set(f"Ready | Today: {datetime.date.today().strftime('%A, %B %d, %Y')}")
+        status_bar = ttk.Label(self.root, textvariable=self.status_var,
+                               relief=tk.SUNKEN, anchor=tk.W)
+        status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+
+    def _on_import_done(self) -> None:
+        """Перечитывает базу и обновляет UI после ручного импорта."""
+        self.db = load_db()
+        self.refresh_all()
+
+    def _reload_after_backup(self) -> None:
+        """Перечитывает базу после swap db.json / db.back.json и обновляет UI."""
+        self.db = load_db()
+        self.refresh_all()
+
+    def _on_settings_change(self, settings) -> None:
+        """Реакция на изменение настроек в UI.
+
+        Персистентность настроек будет добавлена отдельным этапом
+        через data_manager.update_settings.
+        """
+        log(f"settings changed: {settings}")
+
+    def on_calendar_month_change(self, *args) -> None:
         try:
-            if 'notify_before' in settings or 'snooze_minutes' in settings:
-                reschedule_all()
-            
-            if 'window' in settings:
-                window_settings = settings['window']
-                self.root.geometry(f"{window_settings['w']}x{window_settings['h']}+{window_settings['x']}+{window_settings['y']}")
-        except Exception as ex:
-            log(f'update_settings failed: {ex}')
-
-    def _handle_feed_item_click(self, action: str, event: dict) -> None:
-        """Handles actions from event feed items."""
-        if action == 'complete':
-            self._complete_event(event)
-        elif action == 'edit':
-            self._edit_event(event)
-        elif action == 'delete':
-            self._delete_event(event)
-
-    def refresh(self):
-        """Refreshes application data and interface."""
-        try:
-            self.data = load_db()
-            self.data = update_statuses(self.data)
-            save_db(self.data)
-            
-            events_to_show = get_all_events(self.data, self.today - datetime.timedelta(days=7),
-                                           self.today + datetime.timedelta(days=60))
-            if len(events_to_show) > 30:
-                events_to_show = sorted(events_to_show, key=lambda x: (x['date'], x['start']))[:30]
-            
-            self.tabbed_ui.update_events(events_to_show)
-            self._refresh_calendar()
-        except Exception as ex:
-            log(f'refresh failed: {ex}')
-
-    def _manual_import(self):
-        """Triggered after successful import from the import panel."""
-        self.refresh()
-
-    def _complete_event(self, event: dict) -> None:
-        """Marks an event as completed."""
-        try:
-            data = load_db()
-            now_iso = datetime.datetime.now().isoformat()
-            event_id = event['id']
-            
-            if event_id.startswith('rec:'):
-                _, rec_id, date = event_id.split(':', 2)
-                for rec in data['recurring']:
-                    if rec['id'] == rec_id:
-                        if date not in rec['done_dates']:
-                            rec['done_dates'].append(date)
-                        break
+            if args and isinstance(args[0], datetime.date):
+                self.status_var.set(f"Showing: {args[0].strftime('%B %Y')}")
             else:
-                for e in data['events']:
-                    if e['id'] == event_id:
-                        e['status'] = 'done'
-                        e['completed_at'] = now_iso
-                        unschedule_event(event_id)
-                        break
-            save_db(data)
-            self.refresh()
-        except Exception as ex:
-            log(f'complete_event failed: {ex}')
+                self.status_var.set(
+                    f"Ready | Today: {datetime.date.today().strftime('%A, %B %d, %Y')}"
+                )
+        except Exception as e:
+            log(f"on_calendar_month_change: {e}")
 
-    def _edit_event(self, event: dict) -> None:
-        """Edits an existing event."""
-        title = simpledialog.askstring("Edit", "Title:",
-                                       initialvalue=event['title'], parent=self.root)
-        if not title:
-            return
-        desc = simpledialog.askstring("Edit", "Description:",
-                                      initialvalue=event.get('description', ''), parent=self.root)
-        new_date = simpledialog.askstring("Edit", "Date (YYYY-MM-DD):",
-                                          initialvalue=event['date'], parent=self.root)
-        if not new_date:
-            return
-        try:
-            datetime.date.fromisoformat(new_date)
-        except:
-            messagebox.showerror("Error", "Invalid date format")
-            return
+    # ── Обработчики событий UI ────────────────────────────────────────
 
-        data = load_db()
-        for ev in data['events']:
-            if ev['id'] == event['id']:
-                unschedule_event(ev['id'])
-                ev['title'] = title
-                ev['description'] = desc or ''
-                ev['date'] = new_date
-                ev['updated_at'] = datetime.datetime.now().isoformat()
-                break
-        save_db(data)
-        reschedule_all()
-        self.refresh()
-
-    def _delete_event(self, event: dict) -> None:
-        """Deletes an event."""
-        try:
-            data = load_db()
-            event_id = event['id']
-            
-            if event_id.startswith('rec:'):
-                _, rec_id, _ = event_id.split(':', 2)
-                data['recurring'] = [r for r in data['recurring'] if r['id'] != rec_id]
-            else:
-                unschedule_event(event_id)
-                data['events'] = [e for e in data['events'] if e['id'] != event_id]
-            
-            save_db(data)
-            reschedule_all()
-            self.refresh()
-            
-            messagebox.showinfo("Deletion", f"Event '{event['title']}' successfully removed.")
-        except Exception as ex:
-            log(f'delete_event failed: {ex}')
-            messagebox.showerror("Error", f"Error deleting event: {ex}")
-
-    def _on_configure(self, event):
-        """Handles window resize events."""
-        if event.widget == self.root:
-            try:
-                update_settings({
-                    "window": {
-                        "x": self.root.winfo_x(),
-                        "y": self.root.winfo_y(),
-                        "w": self.root.winfo_width(),
-                        "h": self.root.winfo_height()
-                    }
-                })
-            except:
-                pass
-
-    def _on_close(self):
-        """Handles application close event."""
-        try:
-            scheduler.shutdown(wait=False)
-        except:
-            pass
-        self.root.destroy()
-
-    def _auto_refresh(self):
-        """Performs automatic refresh at regular intervals."""
-        self.refresh()
-        self.root.after(120000, self._auto_refresh)
-
-# ─── Scheduler Functions ───
-def unschedule_event(event_id):
-    """Removes an event from the scheduler."""
-    try:
-        scheduler.remove_job(event_id)
-    except:
+    def show_date_events(self, selected_date) -> None:
+        """Обработчик выбора даты (заготовка для будущего развития)."""
         pass
 
+    def show_event_detail_simple(self, event_data) -> None:
+        self.show_event_detail(event_data)
 
-def reschedule_all():
-    """Reschedules all events in the scheduler."""
-    scheduler.remove_all_jobs()
-    
-    data = load_db()
-    now = datetime.datetime.now()
-    notify_before = get_settings().get('notify_before', 10)
-    
-    for e in data['events']:
+    def show_event_detail_from_feed(self, action, event_data) -> None:
+        if action == 'edit':
+            self.show_event_detail(event_data)
+        elif action == 'delete':
+            if messagebox.askyesno("Confirm Delete",
+                                   f"Delete event '{event_data['title']}'?"):
+                self._delete_event(event_data)
+        elif action == 'complete':
+            self._complete_event(event_data)
+
+    def _delete_event(self, event_data) -> None:
+        eid = str(event_data.get('id', ''))
+        if eid.startswith('rec:'):
+            messagebox.showinfo("Delete",
+                                "Recurring occurrence cannot be deleted individually.")
+            return
+        before = len(self.db['events'])
+        self.db['events'] = [e for e in self.db['events'] if e.get('id') != eid]
+        if len(self.db['events']) != before:
+            save_db(self.db)
+            self.refresh_all()
+
+    def _complete_event(self, event_data) -> None:
+        eid = str(event_data.get('id', ''))
+        if eid.startswith('rec:'):
+            parts = eid.split(':', 2)
+            if len(parts) == 3:
+                _, rec_id, iso = parts
+                for rec in self.db.get('recurring', []):
+                    if rec.get('id') == rec_id:
+                        done = set(rec.get('done_dates', []) or [])
+                        done.add(iso)
+                        rec['done_dates'] = sorted(done)
+                        save_db(self.db)
+                        self.refresh_all()
+                        return
+            return
+        for e in self.db['events']:
+            if e.get('id') == eid:
+                e['status'] = 'done'
+                e['completed_at'] = datetime.datetime.now().isoformat()
+                save_db(self.db)
+                self.refresh_all()
+                return
+
+    # ── Лента событий и календарь ─────────────────────────────────────
+
+    def _format_for_feed(self, event: dict) -> dict:
+        """Приводит событие к виду, ожидаемому EventFeed."""
+        return {
+            'id': event.get('id', ''),
+            'title': event.get('title', 'Untitled'),
+            'date': event.get('date', str(datetime.date.today())),
+            'description': event.get('description', ''),
+            'status': event.get('status', 'pending'),
+            'start': event.get('start', '00:00'),
+            'duration': _safe_int(event.get('duration', 60), 60),
+            'category': event.get('category', DEFAULT_CATEGORY),
+        }
+
+    def refresh_event_feed(self) -> None:
+        """Обновляет ленту событий на год вперёд."""
+        today = datetime.date.today()
+        horizon = today + datetime.timedelta(days=365)
+        events = get_all_events(self.db, today, horizon)
+        events.sort(key=lambda e: (e.get('date', ''), e.get('start', '')))
+        formatted = [self._format_for_feed(e) for e in events]
+        if hasattr(self.event_feed, 'update_events'):
+            self.event_feed.update_events(formatted)
+
+    def refresh_all(self) -> None:
+        """Полное обновление календаря и ленты событий."""
+        self.current_date = datetime.date.today()
+        start, end = self.calendar_view._week_range()
+        events = get_all_events(self.db, start, end)
+        self.calendar_view.refresh(events=events)
+        self.refresh_event_feed()
+        self.status_var.set(
+            f"Refreshed | Today: {datetime.date.today().strftime('%A, %B %d, %Y')}"
+        )
+
+    # ── Навигация ─────────────────────────────────────────────────────
+
+    def go_to_today(self) -> None:
+        today = datetime.date.today()
+        self.current_date = today
+        self.calendar_view.reset_to_today()
+        self.refresh_all()
+        self.status_var.set(f"Today: {today.strftime('%A, %B %d, %Y')}")
+
+    def prev_month(self) -> None:
+        self.calendar_view.prev_month()
+        self.refresh_all()
+
+    def next_month(self) -> None:
+        self.calendar_view.next_month()
+        self.refresh_all()
+
+    # ── Диалоги ───────────────────────────────────────────────────────
+
+    def add_event(self) -> None:
+        """Диалог создания нового события."""
+        title = simpledialog.askstring("New Event", "Event Title:")
+        if not title:
+            return
+
+        date_str = simpledialog.askstring(
+            "New Event",
+            f"Date (YYYY-MM-DD) [default: {self.current_date}]:",
+            initialvalue=str(self.current_date),
+        )
+        if not date_str:
+            return
         try:
-            if e['status'] != 'pending':
-                continue
-            event_time = datetime.datetime.fromisoformat(f"{e['date']} {e['start']}")
-            if event_time > now:
-                scheduler.add_job(
-                    notify_event, 'date', run_date=event_time - datetime.timedelta(minutes=notify_before),
-                    args=[e['id']], id=e['id'], misfire_grace_time=60
-                )
-        except Exception as ex:
-            log(f'Error scheduling event: {ex}')
+            datetime.date.fromisoformat(date_str)
+        except ValueError:
+            messagebox.showerror("Error", "Invalid date format. Please use YYYY-MM-DD.")
+            return
 
-    for rec in data['recurring']:
-        try:
-            dates = gen_recurring_dates(rec, datetime.date.today(),
-                                        datetime.date.today() + datetime.timedelta(days=365))
-            for date in dates:
-                if date not in rec.get('skipped_dates', []):
-                    event_time = datetime.datetime.fromisoformat(f"{date.isoformat()} {rec['start']}")
-                    if event_time > now:
-                        event_id = f'rec:{rec["id"]}:{date.isoformat()}'
-                        if event_id not in [j.id for j in scheduler.get_jobs()]:
-                            scheduler.add_job(
-                                notify_event, 'date',
-                                run_date=event_time - datetime.timedelta(minutes=notify_before),
-                                args=[event_id], id=event_id, misfire_grace_time=60
-                            )
-        except Exception as ex:
-            log(f'Error scheduling recurring event: {ex}')
+        time_str = simpledialog.askstring("New Event", "Time (HH:MM) [optional]:")
+        if time_str:
+            try:
+                datetime.datetime.strptime(time_str, '%H:%M')
+            except ValueError:
+                messagebox.showerror("Error", "Invalid time format. Please use HH:MM.")
+                return
 
-# ─── Notifications ───
-def notify_event(event_id):
-    """Sends event notification to the user."""
+        description = simpledialog.askstring("New Event", "Description [optional]:")
+
+        event_id = f"event_{int(datetime.datetime.now().timestamp() * 1000)}"
+        self.db['events'].append({
+            'id': event_id,
+            'title': title,
+            'date': date_str,
+            'start': time_str or '00:00',
+            'duration': 60,
+            'category': DEFAULT_CATEGORY,
+            'description': description or '',
+            'status': 'pending',
+            'created_at': datetime.datetime.now().isoformat(),
+        })
+        save_db(self.db)
+        self.refresh_all()
+        messagebox.showinfo("Success", "Event added successfully!")
+
+    def show_event_detail(self, event: dict) -> None:
+        """Окно с деталями события."""
+        win = tk.Toplevel(self.root)
+        win.title(f"Event: {event.get('title', 'Untitled')}")
+        win.geometry("420x360")
+        win.transient(self.root)
+        win.grab_set()
+
+        ttk.Label(win, text=event.get('title', ''),
+                  font=('Segoe UI', 12, 'bold')).pack(padx=10, pady=5, anchor='w')
+        ttk.Label(win, text=f"Date: {event.get('date', '')}") \
+            .pack(padx=10, pady=2, anchor='w')
+        ttk.Label(win, text=f"Start: {event.get('start', '')}") \
+            .pack(padx=10, pady=2, anchor='w')
+        ttk.Label(win, text=f"Duration: {event.get('duration', 60)} min") \
+            .pack(padx=10, pady=2, anchor='w')
+        ttk.Label(win, text=f"Category: {event.get('category', DEFAULT_CATEGORY)}") \
+            .pack(padx=10, pady=2, anchor='w')
+        ttk.Label(win, text=f"Status: {event.get('status', 'pending')}") \
+            .pack(padx=10, pady=2, anchor='w')
+
+        desc_frame = ttk.LabelFrame(win, text="Description")
+        desc_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        desc = tk.Text(desc_frame, wrap=tk.WORD, height=6)
+        desc.insert(tk.END, event.get('description', '') or 'No description')
+        desc.config(state=tk.DISABLED)
+        desc.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+
+        ttk.Button(win, text="Close", command=win.destroy).pack(pady=8)
+
+    def on_closing(self) -> None:
+        self.root.quit()
+        self.root.destroy()
+        log('Application closed')
+
+    def run(self) -> None:
+        self.root.mainloop()
+
+
+def main() -> None:
     try:
-        data = load_db()
-        event = None
-        
-        for e in data['events']:
-            if e['id'] == event_id:
-                event = e
-                break
-        if not event and event_id.startswith('rec:'):
-            parts = event_id.split(':', 2)
-            if len(parts) >= 3:
-                rec_id, date = parts[1], parts[2]
-                for rec in data['recurring']:
-                    if rec['id'] == rec_id:
-                        event = {
-                            **rec,
-                            'date': date,
-                            'id': event_id,
-                            'status': 'pending' if date not in rec.get('done_dates', []) else 'done'
-                        }
-                        break
-        
-        if event and plyer_ok:
-            plyer_notify.notify(
-                title='Smart Calendar - Event Notification',
-                message=f"Event Reminder: {event['title']}\nDate: {event['date']} Time: {event['start']}",
-                timeout=10,
-                app_name='Smart Calendar',
-                app_icon=str(ICON_PATH) if ICON_PATH.exists() else None,
-            )
-    except Exception as ex:
-        log(f'notify_event failed: {ex}')
-
-# ─── Application Startup ───
-if __name__ == '__main__':
-    try:
-        app = CalendarApp()
-        app.root.title(APP_NAME)
-        reschedule_all()  # Start event notifications
-        app.root.mainloop()
+        app = SmartCalendar()
+        app.run()
     except Exception as e:
-        log(f'Critical error: {e}')
-        print(f'Critical error occurred: {e}')
-        input("Press Enter to exit...")
+        log(f'Application error: {e}')
+        log(traceback.format_exc())
+        try:
+            messagebox.showerror('Error', f'Application error: {e}')
+        except Exception:
+            pass
+
+
+if __name__ == '__main__':
+    main()

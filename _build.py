@@ -22,13 +22,21 @@ from _common import ROOT, ensure_venv, install_missing, ask_extras
 
 
 APP_NAME = "SmartCalendar"
-BUILD_REQUIRED = ["PyInstaller", "apscheduler", "plyer"]
+BUILD_REQUIRED = ["PyInstaller"]  # Removed apscheduler and plyer dependencies
 OPTIONAL_VISUAL = ["ttkbootstrap"]
 
 
 def build_command(python: Path, extras: bool) -> list:
-    # PyInstaller uses ';' on Windows and ':' elsewhere for --add-data.
+    """Формирует команду PyInstaller с учётом ОС.
+
+    Иконка приложения:
+    - Windows: .ico (качество зависит от количества размеров внутри файла);
+    - macOS:   .icns (обязательно для иконки в Dock);
+    - Linux:   --icon не влияет на бинарник, но --add-data нужен
+               для иконки внутри окна через iconphoto.
+    """
     sep = os.pathsep
+    system = platform.system().lower()
 
     cmd = [
         str(python), "-m", "PyInstaller",
@@ -37,10 +45,7 @@ def build_command(python: Path, extras: bool) -> list:
         "--onefile",
         "--windowed",
         f"--name={APP_NAME}",
-        "--hidden-import=apscheduler",
-        "--hidden-import=plyer",
         "--hidden-import=tkinter",
-        "--hidden-import=datetime",
     ]
 
     if extras:
@@ -49,14 +54,19 @@ def build_command(python: Path, extras: bool) -> list:
             "--collect-all=ttkbootstrap",
         ]
 
-    icon = ROOT / "calendar.ico"
-    if icon.exists():
-        cmd.append(f"--icon={icon}")
-        cmd.append(f"--add-data={icon}{sep}.")
+    # Иконка уровня приложения (exe / .app / .app bundle).
+    ico = ROOT / "calendar.ico"
+    icns = ROOT / "calendar.icns"
+    if system == "windows" and ico.exists():
+        cmd.append(f"--icon={ico}")
+    elif system == "darwin" and icns.exists():
+        cmd.append(f"--icon={icns}")
 
-    png = ROOT / "calendar.png"
-    if png.exists():
-        cmd.append(f"--add-data={png}{sep}.")
+    # Ресурсы, кладём в бандл рядом с main.py.
+    for res in ("calendar.ico", "calendar.png", "calendar_512.png"):
+        p = ROOT / res
+        if p.exists():
+            cmd.append(f"--add-data={p}{sep}.")
 
     import_dir = ROOT / "import"
     if import_dir.is_dir():
@@ -111,8 +121,14 @@ def main() -> int:
 
     cleanup()
 
-    exe_name = f"{APP_NAME}.exe" if system.lower() == "windows" else APP_NAME
-    print(f"\nBuild complete: dist/{exe_name}")
+    sysname = system.lower()
+    if sysname == "windows":
+        out = f"{APP_NAME}.exe"
+    elif sysname == "darwin":
+        out = f"{APP_NAME}.app"
+    else:
+        out = APP_NAME
+    print(f"\nBuild complete: dist/{out}")
     return 0
 
 

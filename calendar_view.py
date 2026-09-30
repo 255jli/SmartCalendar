@@ -19,7 +19,7 @@ class CalendarView:
 
     ROW_MIN = 56     # height of one hour, px
     GUTTER = 52      # width of time label column
-    DAY_MIN = 80     # minimum day width
+    DAY_MIN = 88     # minimum day width
     HEADER_H = 44    # height of header with days
 
     def __init__(self, parent, on_date_select=None, on_month_change=None, on_event_select=None):
@@ -27,7 +27,14 @@ class CalendarView:
         self.on_date_select = on_date_select
         self.on_month_change = on_month_change
         self.on_event_select = on_event_select
-        self.curr_week_start = date.today() - timedelta(days=date.today().weekday())
+        today = date.today()
+        # _anchor — «логическая» текущая дата, от которой считается неделя.
+        # _anchor_day — предпочтительный день месяца (например, 31),
+        # сохраняется между перелистываниями месяцев, чтобы << и >>
+        # возвращали ровно в исходное место.
+        self._anchor: date = today
+        self._anchor_day: int = today.day
+        self.curr_week_start = today - timedelta(days=today.weekday())
         self.events: List[Dict[str, Any]] = []
 
         self._week_start: date = self.curr_week_start
@@ -42,12 +49,17 @@ class CalendarView:
 
         nav = tk.Frame(container, bg=self.bg_color)
         nav.pack(fill='x', pady=(0, 8))
-        tk.Button(nav, text="◀", command=self._prev_week,
+        # Двойные стрелки — сдвиг на один календарный месяц.
+        tk.Button(nav, text="<<", command=self.prev_month,
                   font=('Segoe UI', 12)).pack(side='left')
+        tk.Button(nav, text="◀", command=self._prev_week,
+                  font=('Segoe UI', 12)).pack(side='left', padx=(4, 0))
         self.week_label = tk.Label(nav, text="", font=('Segoe UI', 14, 'bold'),
                                    bg=self.bg_color)
         self.week_label.pack(side='left', expand=True)
         tk.Button(nav, text="▶", command=self._next_week,
+                  font=('Segoe UI', 12)).pack(side='right', padx=(0, 4))
+        tk.Button(nav, text=">>", command=self.next_month,
                   font=('Segoe UI', 12)).pack(side='right')
 
         cal = tk.Frame(container)
@@ -87,33 +99,60 @@ class CalendarView:
 
     # ── Navigation ─────────────────────────────────────────────────────
 
+    def _set_anchor(self, d: date, remember_day: bool = True) -> None:
+        """Обновляет опорную дату и пересчитывает начало недели.
+
+        remember_day=True фиксирует день месяца как «предпочтительный»
+        для последующей навигации по месяцам.
+        """
+        self._anchor = d
+        if remember_day:
+            self._anchor_day = d.day
+        self.curr_week_start = d - timedelta(days=d.weekday())
+
     def _prev_week(self) -> None:
-        self.curr_week_start -= timedelta(days=7)
+        self._set_anchor(self._anchor - timedelta(days=7))
         self.refresh()
         if self.on_month_change:
             self.on_month_change()
 
     def _next_week(self) -> None:
-        self.curr_week_start += timedelta(days=7)
+        self._set_anchor(self._anchor + timedelta(days=7))
+        self.refresh()
+        if self.on_month_change:
+            self.on_month_change()
+
+    def _shift_month(self, delta: int) -> None:
+        """Сдвиг ровно на один календарный месяц.
+
+        Предпочтительный день месяца сохраняется. Если в целевом месяце
+        такого дня нет, берётся последний день, но предпочтение остаётся —
+        обратный переход вернёт исходный день.
+        """
+        m = self._anchor.month + delta
+        y = self._anchor.year + (m - 1) // 12
+        m = (m - 1) % 12 + 1
+        day = min(self._anchor_day, calendar.monthrange(y, m)[1])
+        self._set_anchor(date(y, m, day), remember_day=False)
         self.refresh()
         if self.on_month_change:
             self.on_month_change()
 
     def prev_month(self):
-        self.curr_week_start -= timedelta(days=31)
-        self.curr_week_start = self.curr_week_start.replace(day=1)
-        self.refresh()
-        if self.on_month_change:
-            self.on_month_change()
+        self._shift_month(-1)
 
     def next_month(self):
-        self.curr_week_start += timedelta(days=31)
-        self.curr_week_start = self.curr_week_start.replace(day=1)
+        self._shift_month(+1)
+
+    def reset_to_today(self) -> None:
+        """Возвращает вид на текущую неделю."""
+        self._set_anchor(date.today())
         self.refresh()
         if self.on_month_change:
             self.on_month_change()
 
     def _week_range(self) -> Tuple[date, date]:
+        """Границы видимой недели (понедельник — воскресенье)."""
         return self.curr_week_start, self.curr_week_start + timedelta(days=6)
 
     # ── Public API ─────────────────────────────────────────────────────

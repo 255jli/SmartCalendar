@@ -1,0 +1,501 @@
+<pre>To run a command as administrator (user &quot;root&quot;), use &quot;sudo &lt;command&gt;&quot;.
+See &quot;man sudo_root&quot; for details.
+
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~</b></font>$ cd &quot;/media/mint/Новый том/PTP/LocalCalendarProject&quot;
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>/media/mint/Новый том/PTP/LocalCalendarProject</b></font>$ ls
+<font color="#8AE234"><b>JSON_DOCS.md</b></font>  <font color="#8AE234"><b>_run.py</b></font>           <font color="#8AE234"><b>data_manager.py</b></font>    <font color="#8AE234"><b>main.py</b></font>
+<font color="#8AE234"><b>LICENSE</b></font>       <font color="#8AE234"><b>calendar.ico</b></font>      <span style="background-color:#4E9A06"><font color="#3465A4">dist</font></span>               <font color="#8AE234"><b>settings_controls.py</b></font>
+<font color="#8AE234"><b>README.md</b></font>     <font color="#8AE234"><b>calendar.png</b></font>      <font color="#8AE234"><b>event_feed.py</b></font>      <font color="#8AE234"><b>tabbed_ui.py</b></font>
+<span style="background-color:#4E9A06"><font color="#3465A4">__pycache__</font></span>   <font color="#8AE234"><b>calendar.svg</b></font>      <span style="background-color:#4E9A06"><font color="#3465A4">import</font></span>
+<font color="#8AE234"><b>_build.py</b></font>     <font color="#8AE234"><b>calendar_512.png</b></font>  <font color="#8AE234"><b>import_bar.py</b></font>
+<font color="#8AE234"><b>_common.py</b></font>    <font color="#8AE234"><b>calendar_view.py</b></font>  <font color="#8AE234"><b>import_handler.py</b></font>
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>/media/mint/Новый том/PTP/LocalCalendarProject</b></font>$ cd home
+bash: cd: home: No such file or directory
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>/media/mint/Новый том/PTP/LocalCalendarProject</b></font>$ cd ../../../../
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>/media</b></font>$ cd ..
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>/</b></font>$ cd ..
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>/</b></font>$ cd home
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>/home</b></font>$ cd 
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~</b></font>$ cd desktop
+bash: cd: desktop: No such file or directory
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~</b></font>$ cd De*
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop</b></font>$ ls
+<font color="#729FCF"><b>LocalCalendarProject</b></font>  <font color="#8AE234"><b>ubiquity.desktop</b></font>
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop</b></font>$ cd 
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~</b></font>$ cd De*
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop</b></font>$ cd L*
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ python3
+Python 3.12.3 (main, Nov  6 2025, 13:44:16) [GCC 13.3.0] on linux
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; exit()
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ pip -V
+Command &apos;pip&apos; not found, but can be installed with:
+sudo apt install python3-pip
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ python -V
+Command &apos;python&apos; not found, did you mean:
+  command &apos;python3&apos; from deb python3
+  command &apos;python&apos; from deb python-is-python3
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ system
+Command &apos;system&apos; not found, did you mean:
+  command &apos;system3&apos; from deb simh (3.8.1-6.1)
+  command &apos;systemd&apos; from deb systemd (255.4-1ubuntu8.12)
+Try: sudo apt install &lt;deb name&gt;
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ man
+What manual page do you want?
+For example, try &apos;man man&apos;.
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ man man
+man: can&apos;t resolve man7/groff_man.7
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ py
+Command &apos;py&apos; not found, but can be installed with:
+sudo apt install pythonpy
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ python3 _run.py
+=== Smart Calendar Launcher ===
+
+Virtual environment (.venv) was not found.
+Create venv from base Python? (Y/n): Y
+Creating virtual environment in .venv ...
+The virtual environment was not created successfully because ensurepip is not
+available.  On Debian/Ubuntu systems, you need to install the python3-venv
+package using the following command.
+
+    apt install python3.12-venv
+
+You may need to use sudo with that command.  After installing the python3-venv
+package, recreate your virtual environment.
+
+Failing command: /home/mint/Desktop/LocalCalendarProject/.venv/bin/python3
+
+Failed to create virtual environment: Command &apos;[&apos;/usr/bin/python3&apos;, &apos;-m&apos;, &apos;venv&apos;, &apos;/home/mint/Desktop/LocalCalendarProject/.venv&apos;]&apos; returned non-zero exit status 1.
+Falling back to base Python interpreter.
+
+Optional: &apos;ttkbootstrap&apos; makes the UI look nicer.
+Press Enter to use standard widgets, or &apos;y&apos; to install the extra library.
+Install extra visual library? (y/N): N
+Installing: apscheduler, plyer
+/usr/bin/python3: No module named pip
+Package installation failed: Command &apos;[&apos;/usr/bin/python3&apos;, &apos;-m&apos;, &apos;pip&apos;, &apos;install&apos;, &apos;apscheduler&apos;, &apos;plyer&apos;]&apos; returned non-zero exit status 1.
+Press Enter to exit...
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ python3 _run.py
+=== Smart Calendar Launcher ===
+
+Using virtual environment: /home/mint/Desktop/LocalCalendarProject/.venv/bin/python
+
+Optional: &apos;ttkbootstrap&apos; makes the UI look nicer.
+Press Enter to use standard widgets, or &apos;y&apos; to install the extra library.
+Install extra visual library? (y/N): 
+Installing: apscheduler, plyer
+/home/mint/Desktop/LocalCalendarProject/.venv/bin/python: No module named pip
+Package installation failed: Command &apos;[&apos;/home/mint/Desktop/LocalCalendarProject/.venv/bin/python&apos;, &apos;-m&apos;, &apos;pip&apos;, &apos;install&apos;, &apos;apscheduler&apos;, &apos;plyer&apos;]&apos; returned non-zero exit status 1.
+Press Enter to exit...
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ python main.py
+Command &apos;python&apos; not found, did you mean:
+  command &apos;python3&apos; from deb python3
+  command &apos;python&apos; from deb python-is-python3
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ python3 main.py
+Traceback (most recent call last):
+  File &quot;/home/mint/Desktop/LocalCalendarProject/main.py&quot;, line 9, in &lt;module&gt;
+    import tkinter as tk
+ModuleNotFoundError: No module named &apos;tkinter&apos;
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ python3 -m venv .venv
+The virtual environment was not created successfully because ensurepip is not
+available.  On Debian/Ubuntu systems, you need to install the python3-venv
+package using the following command.
+
+    apt install python3.12-venv
+
+You may need to use sudo with that command.  After installing the python3-venv
+package, recreate your virtual environment.
+
+Failing command: /home/mint/Desktop/LocalCalendarProject/.venv/bin/python3
+
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ python3 -m venv .venv
+The virtual environment was not created successfully because ensurepip is not
+available.  On Debian/Ubuntu systems, you need to install the python3-venv
+package using the following command.
+
+    apt install python3.12-venv
+
+You may need to use sudo with that command.  After installing the python3-venv
+package, recreate your virtual environment.
+
+Failing command: /home/mint/Desktop/LocalCalendarProject/.venv/bin/python3
+
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ python3 -V
+Python 3.12.3
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ python3.12 -m venv .venv
+The virtual environment was not created successfully because ensurepip is not
+available.  On Debian/Ubuntu systems, you need to install the python3-venv
+package using the following command.
+
+    apt install python3.12-venv
+
+You may need to use sudo with that command.  After installing the python3-venv
+package, recreate your virtual environment.
+
+Failing command: /home/mint/Desktop/LocalCalendarProject/.venv/bin/python3.12
+
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ python3.12.3 -m venv .venv
+python3.12.3: command not found
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ python list
+Command &apos;python&apos; not found, did you mean:
+  command &apos;python3&apos; from deb python3
+  command &apos;python&apos; from deb python-is-python3
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ where python3
+where: command not found
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ help
+GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)
+These shell commands are defined internally.  Type `help&apos; to see this list.
+Type `help name&apos; to find out more about the function `name&apos;.
+Use `info bash&apos; to find out more about the shell in general.
+Use `man -k&apos; or `info&apos; to find out more about commands not in this list.
+
+A star (*) next to a name means that the command is disabled.
+
+ job_spec [&amp;]                            history [-c] [-d offset] [n] or hist&gt;
+ (( expression ))                        if COMMANDS; then COMMANDS; [ elif C&gt;
+ . filename [arguments]                  jobs [-lnprs] [jobspec ...] or jobs &gt;
+ :                                       kill [-s sigspec | -n signum | -sigs&gt;
+ [ arg... ]                              let arg [arg ...]
+ [[ expression ]]                        local [option] name[=value] ...
+ alias [-p] [name[=value] ... ]          logout [n]
+ bg [job_spec ...]                       mapfile [-d delim] [-n count] [-O or&gt;
+ bind [-lpsvPSVX] [-m keymap] [-f file&gt;  popd [-n] [+N | -N]
+ break [n]                               printf [-v var] format [arguments]
+ builtin [shell-builtin [arg ...]]       pushd [-n] [+N | -N | dir]
+ caller [expr]                           pwd [-LP]
+ case WORD in [PATTERN [| PATTERN]...)&gt;  read [-ers] [-a array] [-d delim] [-&gt;
+ cd [-L|[-P [-e]] [-@]] [dir]            readarray [-d delim] [-n count] [-O &gt;
+ command [-pVv] command [arg ...]        readonly [-aAf] [name[=value] ...] o&gt;
+ compgen [-abcdefgjksuv] [-o option] [&gt;  return [n]
+ complete [-abcdefgjksuv] [-pr] [-DEI]&gt;  select NAME [in WORDS ... ;] do COMM&gt;
+ compopt [-o|+o option] [-DEI] [name .&gt;  set [-abefhkmnptuvxBCEHPT] [-o optio&gt;
+ continue [n]                            shift [n]
+ coproc [NAME] command [redirections]    shopt [-pqsu] [-o] [optname ...]
+ declare [-aAfFgiIlnrtux] [name[=value&gt;  source filename [arguments]
+ dirs [-clpv] [+N] [-N]                  suspend [-f]
+ disown [-h] [-ar] [jobspec ... | pid &gt;  test [expr]
+ echo [-neE] [arg ...]                   time [-p] pipeline
+ enable [-a] [-dnps] [-f filename] [na&gt;  times
+ eval [arg ...]                          trap [-lp] [[arg] signal_spec ...]
+ exec [-cl] [-a name] [command [argume&gt;  true
+ exit [n]                                type [-afptP] name [name ...]
+ export [-fn] [name[=value] ...] or ex&gt;  typeset [-aAfFgiIlnrtux] name[=value&gt;
+ false                                   ulimit [-SHabcdefiklmnpqrstuvxPRT] [&gt;
+ fc [-e ename] [-lnr] [first] [last] o&gt;  umask [-p] [-S] [mode]
+ fg [job_spec]                           unalias [-a] name [name ...]
+ for NAME [in WORDS ... ] ; do COMMAND&gt;  unset [-f] [-v] [-n] [name ...]
+ for (( exp1; exp2; exp3 )); do COMMAN&gt;  until COMMANDS; do COMMANDS-2; done
+ function name { COMMANDS ; } or name &gt;  variables - Names and meanings of so&gt;
+ getopts optstring name [arg ...]        wait [-fn] [-p var] [id ...]
+ hash [-lr] [-p pathname] [-dt] [name &gt;  while COMMANDS; do COMMANDS-2; done
+ help [-dms] [pattern ...]               { COMMANDS ; }
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ printf &quot;It&apos;s freak command promtp console! idk where the python and how create venv, and run this project. And u lil b!&quot;
+It&apos;s freak command promtp console! idk where the python and how create venv, and run this project. And u lil b!<font color="#8AE234"><b>mint@mint</b></font>:~/Des<font color="#729FCF"><b>ktop/LocalCalendarProject</b></font>$ printf &quot;It&apos;s freak command promtp console! idk where the python and how create venv, and run this project. And u lil b!&quot;
+It&apos;s freak command promtp console! idk where the python and how create venv, and run this project. And u lil b!<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ 
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ 
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ 
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ 
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ 
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ printf &quot;It&apos;s freak command promtp console! idk where the python and how create venv, and run this project. And u lil b!&quot;
+It&apos;s freak command promtp console! idk where the python and how create venv, and run this project. And u lil b!<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ LOL
+LOL: command not found
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ lol
+Command &apos;lol&apos; not found, did you mean:
+  command &apos;gol&apos; from deb growl-for-linux (0.8.5-9.1)
+  command &apos;sol&apos; from deb aisleriot (1:3.22.23-1)
+  command &apos;lola&apos; from deb lola (1.6-1)
+  command &apos;col&apos; from deb bsdextrautils (2.39.3-9ubuntu6.4)
+Try: sudo apt install &lt;deb name&gt;
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ wtf !
+Command &apos;wtf&apos; not found, but can be installed with:
+sudo apt install bsdgames
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ printf oh im bored
+oh<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ bye
+Command &apos;bye&apos; not found, did you mean:
+  command &apos;xye&apos; from deb xye (0.12.2+dfsg-12)
+  command &apos;bbe&apos; from deb bbe (0.2.2-5)
+Try: sudo apt install &lt;deb name&gt;
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ ls -la
+total 132
+drwxrwxr-x 7 mint mint   460 Sep 25 15:53 <font color="#729FCF"><b>.</b></font>
+drwxr-xr-x 3 mint mint    80 Sep 25 15:50 <font color="#729FCF"><b>..</b></font>
+drwxrwxrwx 7 mint mint   240 Sep 24 16:32 <span style="background-color:#4E9A06"><font color="#3465A4">.git</font></span>
+drwxrwxr-x 7 mint mint   180 Sep 25 15:53 <font color="#729FCF"><b>.venv</b></font>
+-rwxrwxrwx 1 mint mint    15 Sep 24 12:19 <font color="#8AE234"><b>README.md</b></font>
+drwxrwxr-x 2 mint mint    60 Sep 25 15:53 <font color="#729FCF"><b>__pycache__</b></font>
+-rwxrwxrwx 1 mint mint  3043 Sep 24 16:23 <font color="#8AE234"><b>_build.py</b></font>
+-rwxrwxrwx 1 mint mint  4008 Sep 24 15:59 <font color="#8AE234"><b>_common.py</b></font>
+-rwxrwxrwx 1 mint mint  1336 Sep 24 15:58 <font color="#8AE234"><b>_run.py</b></font>
+-rwxrwxrwx 1 mint mint 12562 Sep 24 16:19 <font color="#8AE234"><b>calendar.ico</b></font>
+-rwxrwxrwx 1 mint mint  3690 Sep 24 16:19 <font color="#8AE234"><b>calendar.png</b></font>
+-rwxrwxrwx 1 mint mint  3545 Sep 20 15:44 <font color="#8AE234"><b>calendar.svg</b></font>
+-rwxrwxrwx 1 mint mint  7931 Sep 24 16:19 <font color="#8AE234"><b>calendar_512.png</b></font>
+-rwxrwxrwx 1 mint mint 12989 Sep 24 16:09 <font color="#8AE234"><b>calendar_view.py</b></font>
+-rwxrwxrwx 1 mint mint  3284 Sep 24 14:04 <font color="#8AE234"><b>data_manager.py</b></font>
+drwxrwxrwx 3 mint mint    80 Sep 24 16:27 <span style="background-color:#4E9A06"><font color="#3465A4">dist</font></span>
+-rwxrwxrwx 1 mint mint  6419 Sep 24 16:09 <font color="#8AE234"><b>event_feed.py</b></font>
+drwxrwxrwx 2 mint mint    80 Sep 25 09:16 <span style="background-color:#4E9A06"><font color="#3465A4">import</font></span>
+-rwxrwxrwx 1 mint mint  4797 Sep 24 13:53 <font color="#8AE234"><b>import_bar.py</b></font>
+-rwxrwxrwx 1 mint mint  7712 Sep 24 13:53 <font color="#8AE234"><b>import_handler.py</b></font>
+-rwxrwxrwx 1 mint mint 18057 Sep 24 16:23 <font color="#8AE234"><b>main.py</b></font>
+-rwxrwxrwx 1 mint mint  4093 Sep 24 13:54 <font color="#8AE234"><b>settings_controls.py</b></font>
+-rwxrwxrwx 1 mint mint 16340 Sep 24 14:28 <font color="#8AE234"><b>tabbed_ui.py</b></font>
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject</b></font>$ cd .venv
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv</b></font>$ ls
+<span style="background-color:#4E9A06"><font color="#3465A4">Include</font></span>  <font color="#729FCF"><b>Lib</b></font>  <font color="#729FCF"><b>bin</b></font>  <font color="#729FCF"><b>include</b></font>  <font color="#729FCF"><b>lib</b></font>  <font color="#34E2E2"><b>lib64</b></font>  pyvenv.cfg
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv</b></font>$ 
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv</b></font>$ cd bin
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ ls
+<font color="#34E2E2"><b>python</b></font>  <font color="#34E2E2"><b>python3</b></font>  <font color="#34E2E2"><b>python3.12</b></font>
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ ./python
+Python 3.12.3 (main, Nov  6 2025, 13:44:16) [GCC 13.3.0] on linux
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; print(4*439503\435)
+  File &quot;&lt;stdin&gt;&quot;, line 1
+    print(4*439503\435)
+                   ^
+SyntaxError: unexpected character after line continuation character
+&gt;&gt;&gt; print(4*439503:35^35)
+  File &quot;&lt;stdin&gt;&quot;, line 1
+    print(4*439503:35^35)
+                  ^
+SyntaxError: invalid syntax
+&gt;&gt;&gt; print(4*439503-35^35)
+1758010
+&gt;&gt;&gt; print(4*4395036342^43643534-35^35)
+17536534672
+&gt;&gt;&gt; print(4*4395036342^43643534-35^35435)
+17536565976
+&gt;&gt;&gt; print(4*4395036342^43643534-35^35435345)
+17571970018
+&gt;&gt;&gt; print(4*4395036342^43643534-35^3543534435453455)
+3543551795528380
+&gt;&gt;&gt; print(4*4395036342^43643534-35^35435344)
+17571970019
+&gt;&gt;&gt; exit9)
+  File &quot;&lt;stdin&gt;&quot;, line 1
+    exit9)
+         ^
+SyntaxError: unmatched &apos;)&apos;
+&gt;&gt;&gt; exit()
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ bruh
+bruh: command not found
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ copy @a
+Command &apos;copy&apos; not found, did you mean:
+  command &apos;fcopy&apos; from deb fai-client (6.0.5ubuntu1)
+  command &apos;ropy&apos; from deb libdisorder-tools (0.0.2+git20130809.8062ee1-4)
+  command &apos;copyq&apos; from deb copyq (7.1.0-1)
+  command &apos;bcopy&apos; from deb bacula-sd (9.6.7-7)
+  command &apos;hcopy&apos; from deb hfsutils (3.2.6-15build2)
+  command &apos;rcopy&apos; from deb rdmacm-utils (50.0-2ubuntu0.2)
+  command &apos;mcopy&apos; from deb mtools (4.0.43-1)
+Try: sudo apt install &lt;deb name&gt;
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ copy
+Command &apos;copy&apos; not found, did you mean:
+  command &apos;bcopy&apos; from deb bacula-sd (9.6.7-7)
+  command &apos;rcopy&apos; from deb rdmacm-utils (50.0-2ubuntu0.2)
+  command &apos;ropy&apos; from deb libdisorder-tools (0.0.2+git20130809.8062ee1-4)
+  command &apos;copyq&apos; from deb copyq (7.1.0-1)
+  command &apos;mcopy&apos; from deb mtools (4.0.43-1)
+  command &apos;hcopy&apos; from deb hfsutils (3.2.6-15build2)
+  command &apos;fcopy&apos; from deb fai-client (6.0.5ubuntu1)
+Try: sudo apt install &lt;deb name&gt;
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ man copy
+No manual entry for copy
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ f$#%!
+f0%!: command not found
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ oh, u wann(zahochesh!) found it!
+bash: !: event not found
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf &quot;idk\n\t\p&quot;
+idk
+	\p<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf &quot;idk\nkdkp&quot;
+idk
+	\idtiidkdkp<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf &quot;idk\n\&quot;
+&gt; 
+&gt; h
+&gt; gfg
+&gt; ^C
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf &quot;\n&quot;
+
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf &quot;\n\t&quot;
+
+	<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf &quot;\n\t\n&quot;
+
+	
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf &quot;\n\t\n&quot;
+
+	
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf &quot;wow\nidk\tfreakday\n&quot;
+wow
+idk	freakday
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf &quot;wow \n idk \t freakday \n&quot;
+wow 
+ idk 	 freakday 
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf &quot;wow \n idk \t f \n&quot;
+wow 
+ idk 	 f 
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf &quot;wow \n idk \t f \n &quot;::4
+wow 
+ idk 	 f 
+ ::4<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf &quot;wow \n idk \t f \n &quot;::3
+wow 
+ idk 	 f 
+ ::3<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf &quot;wow \n idk \t f \n :4&quot;
+wow 
+ idk 	 f 
+  
+ :4<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf 4+5
+4+5<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ printf 4+5=
+4+5=<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ $g
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ $g = 5
+=: command not found
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ g*5
+Command &apos;g*5&apos; not found, did you mean:
+  command &apos;gt5&apos; from deb gt5 (1.5.0~20111220+bzr29-4)
+Try: sudo apt install &lt;deb name&gt;
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ g=5
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ g
+g: command not found
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ $g
+5: command not found
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ $g
+5: command not found
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ $g * 5
+5: command not found
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ $g*5
+5*5: command not found
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ summ($g*5)
+bash: syntax error near unexpected token `$g*5&apos;
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ summ
+Command &apos;summ&apos; not found, did you mean:
+  command &apos;sumo&apos; from deb sumo (1.18.0+dfsg-3build2)
+  command &apos;sum&apos; from deb coreutils (9.4-3ubuntu6.1)
+Try: sudo apt install &lt;deb name&gt;
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ help
+GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)
+These shell commands are defined internally.  Type `help&apos; to see this list.
+Type `help name&apos; to find out more about the function `name&apos;.
+Use `info bash&apos; to find out more about the shell in general.
+Use `man -k&apos; or `info&apos; to find out more about commands not in this list.
+
+A star (*) next to a name means that the command is disabled.
+
+ job_spec [&amp;]                            history [-c] [-d offset] [n] or hist&gt;
+ (( expression ))                        if COMMANDS; then COMMANDS; [ elif C&gt;
+ . filename [arguments]                  jobs [-lnprs] [jobspec ...] or jobs &gt;
+ :                                       kill [-s sigspec | -n signum | -sigs&gt;
+ [ arg... ]                              let arg [arg ...]
+ [[ expression ]]                        local [option] name[=value] ...
+ alias [-p] [name[=value] ... ]          logout [n]
+ bg [job_spec ...]                       mapfile [-d delim] [-n count] [-O or&gt;
+ bind [-lpsvPSVX] [-m keymap] [-f file&gt;  popd [-n] [+N | -N]
+ break [n]                               printf [-v var] format [arguments]
+ builtin [shell-builtin [arg ...]]       pushd [-n] [+N | -N | dir]
+ caller [expr]                           pwd [-LP]
+ case WORD in [PATTERN [| PATTERN]...)&gt;  read [-ers] [-a array] [-d delim] [-&gt;
+ cd [-L|[-P [-e]] [-@]] [dir]            readarray [-d delim] [-n count] [-O &gt;
+ command [-pVv] command [arg ...]        readonly [-aAf] [name[=value] ...] o&gt;
+ compgen [-abcdefgjksuv] [-o option] [&gt;  return [n]
+ complete [-abcdefgjksuv] [-pr] [-DEI]&gt;  select NAME [in WORDS ... ;] do COMM&gt;
+ compopt [-o|+o option] [-DEI] [name .&gt;  set [-abefhkmnptuvxBCEHPT] [-o optio&gt;
+ continue [n]                            shift [n]
+ coproc [NAME] command [redirections]    shopt [-pqsu] [-o] [optname ...]
+ declare [-aAfFgiIlnrtux] [name[=value&gt;  source filename [arguments]
+ dirs [-clpv] [+N] [-N]                  suspend [-f]
+ disown [-h] [-ar] [jobspec ... | pid &gt;  test [expr]
+ echo [-neE] [arg ...]                   time [-p] pipeline
+ enable [-a] [-dnps] [-f filename] [na&gt;  times
+ eval [arg ...]                          trap [-lp] [[arg] signal_spec ...]
+ exec [-cl] [-a name] [command [argume&gt;  true
+ exit [n]                                type [-afptP] name [name ...]
+ export [-fn] [name[=value] ...] or ex&gt;  typeset [-aAfFgiIlnrtux] name[=value&gt;
+ false                                   ulimit [-SHabcdefiklmnpqrstuvxPRT] [&gt;
+ fc [-e ename] [-lnr] [first] [last] o&gt;  umask [-p] [-S] [mode]
+ fg [job_spec]                           unalias [-a] name [name ...]
+ for NAME [in WORDS ... ] ; do COMMAND&gt;  unset [-f] [-v] [-n] [name ...]
+ for (( exp1; exp2; exp3 )); do COMMAN&gt;  until COMMANDS; do COMMANDS-2; done
+ function name { COMMANDS ; } or name &gt;  variables - Names and meanings of so&gt;
+ getopts optstring name [arg ...]        wait [-fn] [-p var] [id ...]
+ hash [-lr] [-p pathname] [-dt] [name &gt;  while COMMANDS; do COMMANDS-2; done
+ help [-dms] [pattern ...]               { COMMANDS ; }
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ test
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ history
+    1  cd &quot;/media/mint/Новый том/PTP/LocalCalendarProject&quot;
+    2  ls
+    3  cd home
+    4  cd ../../../../
+    5  cd ..
+    6  cd home
+    7  cd 
+    8  cd desktop
+    9  cd De*
+   10  ls
+   11  cd 
+   12  cd De*
+   13  cd L*
+   14  python3
+   15  pip -V
+   16  python -V
+   17  system
+   18  man
+   19  man man
+   20  py
+   21  python3 _run.py
+   22  python main.py
+   23  python3 main.py
+   24  python3 -m venv .venv
+   25  python3 -V
+   26  python3.12 -m venv .venv
+   27  python3.12.3 -m venv .venv
+   28  python list
+   29  where python3
+   30  help
+   31  printf &quot;It&apos;s freak command promtp console! idk where the python and how create venv, and run this project. And u lil b!&quot;
+   32  LOL
+   33  lol
+   34  wtf !
+   35  printf oh im bored
+   36  bye
+   37  ls -la
+   38  cd .venv
+   39  ls
+   40  cd bin
+   41  ls
+   42  ./python
+   43  bruh
+   44  copy @a
+   45  copy
+   46  man copy
+   47  f$#%!
+   48  printf &quot;idk\n\t\p&quot;
+   49  printf &quot;idk\n\t\idtiidkdkp&quot;
+   50  printf &quot;idk\n\&quot;
+
+h
+gfg
+   51  printf &quot;\n&quot;
+   52  printf &quot;\n\t&quot;
+   53  printf &quot;\n\t\n&quot;
+   54  printf &quot;wow\nidk\tfreakday\n&quot;
+   55  printf &quot;wow \n idk \t freakday \n&quot;
+   56  printf &quot;wow \n idk \t f \n&quot;
+   57  printf &quot;wow \n idk \t f \n &quot;::4
+   58  printf &quot;wow \n idk \t f \n &quot;::3
+   59  printf &quot;wow \n idk \t f \n  \n :4&quot;
+   60  printf 4+5
+   61  printf 4+5=
+   62  $g
+   63  $g = 5
+   64  g*5
+   65  g=5
+   66  g
+   67  $g
+   68  $g * 5
+   69  $g*5
+   70  summ($g*5)
+   71  summ
+   72  help
+   73  test
+   74  history
+<font color="#8AE234"><b>mint@mint</b></font>:<font color="#729FCF"><b>~/Desktop/LocalCalendarProject/.venv/bin</b></font>$ 
+</pre>

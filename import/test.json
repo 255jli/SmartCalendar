@@ -1,0 +1,62 @@
+{
+  "events": [
+    {
+      "id": "demo_meeting_1",
+      "title": "Team sync",
+      "date": "2026-09-30",
+      "start": "10:00",
+      "duration": 60,
+      "category": "meeting",
+      "description": "Weekly team meeting",
+      "status": "pending"
+    },
+    {
+      "id": "demo_task_1",
+      "title": "Prepare report",
+      "date": "2026-10-01",
+      "start": "14:00",
+      "duration": 90,
+      "category": "task",
+      "description": "Q4 planning document",
+      "status": "pending"
+    },
+    {
+      "id": "demo_personal_1",
+      "title": "Gym",
+      "date": "2026-10-02",
+      "start": "18:30",
+      "duration": 60,
+      "category": "personal",
+      "description": "",
+      "status": "pending"
+    }
+  ],
+  "recurring": [
+    {
+      "id": "demo_rec_daily",
+      "title": "Morning standup",
+      "start": "09:00",
+      "start_date": "2026-09-29",
+      "duration": 15,
+      "category": "meeting",
+      "description": "Daily standup",
+      "rule": { "freq": "daily", "interval": 1 },
+      "status": "pending",
+      "done_dates": [],
+      "skipped_dates": []
+    },
+    {
+      "id": "demo_rec_weekly",
+      "title": "Weekly review",
+      "start": "16:00",
+      "start_date": "2026-09-25",
+      "duration": 60,
+      "category": "task",
+      "description": "Weekly review and planning",
+      "rule": { "freq": "weekly", "interval": 1, "until": "2026-12-31" },
+      "status": "pending",
+      "done_dates": ["2026-09-25"],
+      "skipped_dates": []
+    }
+  ]
+}

@@ -27,7 +27,7 @@ class EventFeed:
         self._create_widgets()
         
     def _create_widgets(self) -> None:
-        """Создает компоненты интерфейса."""
+        """Creates UI components."""
         # Create container for scrolling
         container = tk.Frame(self.parent, bg=self.BG)
         container.pack(fill='both', expand=True)
@@ -44,15 +44,30 @@ class EventFeed:
         self.feed_frame.bind('<Configure>',
                              lambda e: canvas.configure(scrollregion=canvas.bbox('all')))
         
-        # Create window with frame on canvas
-        canvas.create_window((0, 0), window=self.feed_frame, anchor='nw', width=580)
+        # Save window id and create window without fixed width
+        self._win = canvas.create_window((0, 0), window=self.feed_frame, anchor='nw')
+        
+        # Add canvas resize handler
+        def _on_canvas_resize(event):
+            canvas.itemconfigure(self._win, width=event.width)
+        canvas.bind('<Configure>', _on_canvas_resize)
+        
         canvas.configure(yscrollcommand=scrollbar.set)
         
-        # Bind mouse wheel to canvas
+        # Прокрутка колесом: Windows/macOS — MouseWheel, Linux — Button-4/5.
         def _on_mousewheel(event):
-            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        
+            num = getattr(event, 'num', None)
+            if num == 4:
+                delta = -1
+            elif num == 5:
+                delta = 1
+            else:
+                delta = -int(event.delta / 120)
+            canvas.yview_scroll(delta, "units")
+
         canvas.bind("<MouseWheel>", _on_mousewheel)
+        canvas.bind("<Button-4>", _on_mousewheel)
+        canvas.bind("<Button-5>", _on_mousewheel)
         
         canvas.pack(side='left', fill='both', expand=True)
 
